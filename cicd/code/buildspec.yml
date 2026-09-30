@@ -1,0 +1,21 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.7
+    commands:
+      - pip3 install pytest
+
+  build:
+    commands:
+    - echo $CODEBUILD_SRC_DIR
+    - ls -l
+    - cd cicd/code
+    - cd ../../job/code/extra_module/common
+    - echo "=============================Upload lambda function.====================================="
+    - cd ../../../lambda_fun
+    - zip bd_auto_recovery_end_file bd_auto_recovery_end_file.py
+    - aws lambda update-function-code \--function-name $CI_DATALAKE_AUTO_RECOVERY \--zip-file fileb://ci_auto_recovery_end_file.zip
+    - echo "=============================Upload lambda json====================================="
+    - aws s3 cp ./ci_datalake_auto_recovery.json s3://$S3_BUCKET_DATA_HUB_STAGING/auto_recovery/config/
